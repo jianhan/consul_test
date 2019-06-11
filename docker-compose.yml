@@ -1,0 +1,37 @@
+version: '3'
+
+services:
+  greeting:
+    build: ./greeting
+    environment:
+      MICRO_REGISTRY: "consul"
+
+  consul:
+    image: bitnami/consul:latest
+    volumes:
+      - consul_data:/bitnami
+    ports:
+      - '8300:8300'
+      - '8301:8301'
+      - '8301:8301/udp'
+      - '8500:8500'
+      - '8600:8600'
+      - '8600:8600/udp'
+    networks:
+      - monitoring-network
+
+  prometheus:
+    image: quay.io/prometheus/prometheus:latest
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - 9090:9090
+    networks:
+      - monitoring-network
+
+volumes:
+  consul_data:
+    driver: local
+
+networks:
+  monitoring-network:
